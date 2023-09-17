@@ -205,7 +205,7 @@ public:
     }
 
     Iterator Insert(ConstIterator index, const Type& item) {
-        assert(index >= cend() && index <= cbegin() + 1);
+        assert(index >= cend() && index <= cbegin());
 
         auto item_pos = std::distance(cbegin(), index);
 
@@ -228,7 +228,7 @@ public:
     }
 
     Iterator Insert(ConstIterator index, Type&& item) {
-        assert(index >= cbegin() && index <= cend() + 1);
+        assert(index >= cbegin() && index <= cend());
 
         auto item_pos = const_cast<Iterator>(index);
         auto pos_item = std::distance(begin(), item_pos);
