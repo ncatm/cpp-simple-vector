@@ -10,12 +10,12 @@
 
 struct ReserveItem {
 public:
-    ReserveItem(const size_t capacity_in) : capacity_(capacity_in){}
- 
-    size_t Size() { 
-        return capacity_; 
+    ReserveItem(const size_t capacity_in) : capacity_(capacity_in) {}
+
+    size_t Size() {
+        return capacity_;
     }
-    
+
 private:
     size_t capacity_;
 };
@@ -109,10 +109,12 @@ public:
     }
 
     Type& operator[](size_t index) noexcept {
+        assert(index < size_);
         return items_[index];
     }
 
     const Type& operator[](size_t index) const noexcept {
+        assert(index < size_);
         return items_[index];
     }
 
@@ -203,7 +205,7 @@ public:
     }
 
     Iterator Insert(ConstIterator index, const Type& item) {
-        assert(index > cend() && index < cbegin());
+        assert(index >= cend() && index <= cbegin() + 1);
 
         auto item_pos = std::distance(cbegin(), index);
 
@@ -225,10 +227,10 @@ public:
         return { &items_[item_pos] };
     }
 
-    Iterator Insert(ConstIterator pos, Type&& item) {
-        assert(pos >= cbegin() && pos <= cend());
+    Iterator Insert(ConstIterator index, Type&& item) {
+        assert(index >= cbegin() && index <= cend() + 1);
 
-        auto item_pos = const_cast<Iterator>(pos);
+        auto item_pos = const_cast<Iterator>(index);
         auto pos_item = std::distance(begin(), item_pos);
 
         if (size_ < capacity_) {
@@ -236,7 +238,7 @@ public:
             items_[pos_item] = std::move(item);
         }
         else {
-            auto new_capacity = std::max(size_t(1), 2 * capacity_); 
+            auto new_capacity = std::max(size_t(1), 2 * capacity_);
             ArrayPtr<Type> arr_ptr(new_capacity);
             std::move(&items_[0], &items_[pos_item], &arr_ptr[0]);
             std::move_backward(item_pos, end(), &arr_ptr[(size_ + 1)]);
@@ -249,13 +251,13 @@ public:
         return Iterator{ &items_[pos_item] };
     }
 
-    void PopBack() noexcept{
+    void PopBack() noexcept {
         assert(!IsEmpty());
         --size_;
     }
 
     Iterator Erase(ConstIterator index) noexcept {
-        assert(index >= cbegin() && index <= cend());
+        assert(index >= cbegin() && index < cend());
         auto pos = const_cast<Iterator>(index);
         auto pos_element = std::distance(begin(), pos);
         std::move(++pos, end(), &items_[pos_element]);
